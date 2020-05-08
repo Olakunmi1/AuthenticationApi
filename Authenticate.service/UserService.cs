@@ -1,4 +1,5 @@
 ﻿using Authenticate.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,47 +88,55 @@ namespace Authenticate.Service
             return _context.Users;
         }
 
-        public void Update(User user, string password = null)
+        public void Update(User userparam, string password = null)
         {
 
-            var users = _context.Users.Find(user.Id);
+            var users = _context.Users.Find(userparam.Id);
 
-            if (user == null)
+            if (users == null)
                 throw new ArgumentException("User not found");
 
             // update username if it has changed
-            if (!string.IsNullOrWhiteSpace(user.Username) && user.Username != users.Username)
+            if (!string.IsNullOrWhiteSpace(userparam.Username) && userparam.Username != users.Username)
             {
                 // throw error if the new username is already taken
-                if (_context.Users.Any(x => x.Username == user.Username))
-                    throw new ArgumentException("Username " + user.Username + " is already taken");
+                if (_context.Users.Any(x => x.Username == userparam.Username))
+                    throw new ArgumentException("Username " + userparam.Username + " is already taken");
 
-                user.Username = user.Username;
+                users.Username = userparam.Username;
             }
 
-            // update user properties if provided
-            if (!string.IsNullOrWhiteSpace(user.FirstName) && !string.IsNullOrWhiteSpace(user.LastName))
+            // update fristname if it has changed
+            if (!string.IsNullOrWhiteSpace(userparam.FirstName) && userparam.FirstName != users.FirstName)
             {
-                users.FirstName = user.FirstName;
-                users.LastName = user.LastName;
+                // throw error if the new firstname is already taken
+                if (_context.Users.Any(x => x.FirstName == userparam.FirstName))
+                    throw new ArgumentException("FirstName " + userparam.FirstName + " is already taken");
+
+                users.FirstName = userparam.FirstName;
             }
-          
 
-            // update user properties if provided
-            if (!string.IsNullOrWhiteSpace(user.LastName))
-                users.LastName = user.LastName;
+            // update lastname if it has changed
+            if (!string.IsNullOrWhiteSpace(userparam.LastName) && userparam.LastName != users.LastName)
+            {
+                // throw error if the new lastname is already taken
+                if (_context.Users.Any(x => x.LastName == userparam.LastName))
+                    throw new ArgumentException("LAstName " + userparam.LastName + " is already taken");
 
+                users.LastName = userparam.LastName;
+            }
+             
             // update password if provided
             if (!string.IsNullOrWhiteSpace(password))
             {
                 byte[] passwordHash, passwordSalt;
                 CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
+                users.PasswordHash = passwordHash;
+                users.PasswordSalt = passwordSalt;
             }
 
-            _context.Users.Attach(user);
+            _context.Users.Update(users);
             _context.SaveChanges();
 
         }
