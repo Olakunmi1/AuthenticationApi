@@ -60,6 +60,7 @@ namespace AuthenticationApi.Controller
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
+            var expiresWhen = tokenDescriptor.Expires;
 
             // return basic user info and authentication token
             return Ok(new
@@ -68,7 +69,9 @@ namespace AuthenticationApi.Controller
                 Username = user.Username,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Token = tokenString
+                Token = tokenString,
+                expires = expiresWhen
+
             });
         }
 
@@ -121,7 +124,7 @@ namespace AuthenticationApi.Controller
 
             catch (ArgumentException ex)
             {
-                return BadRequest(new { messg = ex.Message });
+                return NotFound(new { messg = ex.Message });
             }
            
         }
