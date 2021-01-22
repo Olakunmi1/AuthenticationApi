@@ -54,13 +54,18 @@ namespace AuthenticationApi.Controller
                     new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                 }),
-                Expires = DateTime.UtcNow.AddDays(7),
+                Expires = DateTime.UtcNow.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
                
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            
             var tokenString = tokenHandler.WriteToken(token);
             var expiresWhen = tokenDescriptor.Expires;
+
+            //to validate token 
+            //var validate = tokenHandler.ValidateToken(tokenString);
 
             // return basic user info and authentication token
             return Ok(new

@@ -149,6 +149,9 @@ namespace AuthenticationApi
             app.UseStaticFiles();
 
             app.UseRouting();
+
+           // app.UseJwtAuthentication(); //--to validate token 
+
             app.UseAuthentication();
             app.UseAuthorization();
 
